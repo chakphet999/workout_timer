@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>chakphet</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(135deg, #81ecec, #6c5ce7 80%);
+      min-height: 100vh;
+      margin: 0; padding: 0;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .container {
+      background: rgba(255,255,255,0.92);
+      border-radius: 25px;
+      padding: 38px 28px 30px 28px;
+      max-width: 400px;
+      box-shadow: 0 8px 40px 0 rgba(44,62,80,0.13);
+      text-align: center;
+    }
+    h2 { color: #4834d4; margin-bottom: .5em; font-weight:600; font-size: 2em; }
+    label { display: block; margin: 18px 0 0 0; font-size: 1.1em;color: #222f3e;text-align:left;}
+    input[type="number"] {
+      margin-top: 6px; width: 90%; padding: 10px;
+      border: 1.5px solid #a29bfe; border-radius: 8px; font-size: 1.1em; outline: none; background: #f8fafd;
+    }
+    input[type="number"]:focus { border: 2px solid #4834d4; }
+    .button-row { display: flex; gap: 10px; margin-top: 24px;width: 100%; }
+    button {
+      padding: 14px 0;font-size: 1.12em; flex: 1 1 0; font-family: inherit;
+      background: linear-gradient(90deg, #6c5ce7 60%, #00b894 110%); color: #fff;
+      border: none; border-radius: 10px; font-weight: bold; letter-spacing: 1.5px;
+      box-shadow: 0 2px 16px 0 rgba(76,201,240,0.06); cursor:pointer; transition: background 0.20s, box-shadow 0.14s;
+    }
+    button[disabled] { opacity: 0.65; cursor: not-allowed; background: #bbb !important; }
+    .btn-stop { background: linear-gradient(90deg, #d63031 60%, #e17055 110%);}
+    .btn-stop:active { background: #b12c2c; }
+    .btn-reset {
+      background: linear-gradient(90deg, #636e72 60%, #b2bec3 110%);
+      color: #333;
+    }
+    .btn-reset:active { background: #636e72; color: #fff; }
+    .status {
+      margin: 24px 0 0 0;padding: 16px; font-size: 1.4em; color: #636e72; min-height: 40px;
+      border-radius: 11px;background: linear-gradient(99deg,#fff 60%, #81ecec33 100%);
+      box-shadow: 0 1px 10px 0 #dedede1f;transition: background 0.2s, color 0.2s;
+      display: flex; align-items:center; gap:10px; justify-content: center;
+    }
+    .status .emoji { font-size: 2.6em;}
+    .success { color: #098450; background: #e7fbee; }
+    .alert   { color: #e17055; background: #fff4ec; }
+    .progress-ct {
+      margin:18px 0 4px 0; padding: 0;
+    }
+    .progress-title {
+      font-size: 0.98em; color: #888; font-weight: 400;
+      letter-spacing: .7px;margin:0 0 6px 2px;text-align:left;
+    }
+    .progress-bar {
+      width:100%; height: 16px; background: #dfe6e9; border-radius: 9px;
+      margin:0; overflow: hidden; position: relative; box-shadow: 0 2px 8px 0 #d0d6f81a;
+    }
+    .progress-done {
+      height:100%; border-radius:9px;
+      background: linear-gradient(87deg, #00b894 60%, #6c5ce7 100%);
+      transition: width 0.5s cubic-bezier(.5,.56,.36,1.33), background .25s; box-shadow: 0 1px 4px 0 #22a59922;
+    }
+    .progress-done.danger {
+      background: linear-gradient(90deg,#fd5a51 60%, #a29bfe 150%);
+    }
+    .info-bar {
+      margin: 8px 0 0 0; font-size:1.04em; color:#636e72;
+    }
+    @media (max-width: 440px) {
+      .container { padding: 18px 2px 12px 2px; }
+      .status { font-size: 1em;}
+      .progress-title { font-size:.93em;}
+      h2 { font-size:1.35em;}
+      .status .emoji { font-size: 2em;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>... TIME COUNTER ...</h2>
+    <form id="timerForm" autocomplete="off">
+      <label for="sets">จำนวนเซท</label>
+      <input type="number" id="sets" value="4" min="1" max="30" required>
+      <label for="seconds">วินาทีต่อเซท</label>
+      <input type="number" id="seconds" value="30" min="1" max="3600" required>
+      <div class="button-row">
+        <button type="submit" id="btn-start">เริ่มจับเวลา</button>
+        <button type="button" class="btn-stop" id="btn-stop" disabled>หยุด</button>
+        <button type="button" class="btn-reset" id="btn-reset" disabled>รีเซ็ต</button>
+      </div>
+    </form>
+    <div class="progress-ct">
+      <div class="progress-title">ภาพรวมเซท</div>
+      <div class="progress-bar"><div class="progress-done" id="barSet" style="width:0%"></div></div>
+      <div class="progress-title">เวลาของเซทปัจจุบัน</div>
+      <div class="progress-bar"><div class="progress-done" id="barTick" style="width:0%"></div></div>
+    </div>
+    <div class="info-bar" id="totalTime">เวลารวม ~0:00 นาที</div>
+    <div class="status" id="status"><span class="emoji">😃</span> พร้อมเริ่ม</div>
+  </div>
+  <script>
+    const form = document.getElementById('timerForm');
+    const statusEl = document.getElementById('status');
+    const emojiEl = statusEl.querySelector('.emoji');
+    const btnStart = document.getElementById('btn-start');
+    const btnStop = document.getElementById('btn-stop');
+    const btnReset = document.getElementById('btn-reset');
+    const inputs = Array.from(form.querySelectorAll('input[type="number"]'));
+    const barSet = document.getElementById('barSet');
+    const barTick = document.getElementById('barTick');
+    const infoTotal = document.getElementById('totalTime');
+
+    let running=false, stopped=false, resetCalled=false, s=0, sec=0, sets=0, seconds=0, 
+        completedSets=0;
+
+    // Beep ฟังค์ชั่น
+    function beepSuccess() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(1380, ctx.currentTime);
+        o.connect(g); g.connect(ctx.destination);
+        g.gain.value = 0.5;
+        o.start();
+        setTimeout(()=>{ o.frequency.setValueAtTime(3000,ctx.currentTime); },80);
+        setTimeout(() => { o.stop(); ctx.close(); }, 180);
+      } catch(e){}
+    }
+    function beepAlert() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(320, ctx.currentTime);
+        o.connect(g); g.connect(ctx.destination);
+        g.gain.value = 0.3;
+        o.start();
+        setTimeout(() => { o.stop(); ctx.close(); }, 410);
+      } catch(e){}
+    }
+
+    function showInfoTotal() {
+      const setVal = Number(document.getElementById('sets').value) || 0;
+      const secVal = Number(document.getElementById('seconds').value) || 0;
+      let totalSecs = setVal * secVal;
+      let mm = Math.floor(totalSecs/60), ss = totalSecs%60;
+      infoTotal.textContent = `เวลารวม ~${mm}:${ss.toString().padStart(2,"0")} นาที`;
+    }
+    showInfoTotal(); // เรียกตอนโหลด
+
+    async function startTimer() {
+      sets = parseInt(document.getElementById('sets').value, 10);
+      seconds = parseInt(document.getElementById('seconds').value, 10);
+      s = 1; completedSets = 0;
+      running = true; stopped = false; resetCalled = false;
+
+      inputs.forEach(el=>el.disabled=true);
+      btnStart.disabled=true;
+      btnStop.disabled=false;
+      btnReset.disabled=false;
+      barSet.style.width = "0%";
+      barTick.style.width = "0%";
+      barSet.className = "progress-done";
+      barTick.className = "progress-done";
+      emojiEl.textContent = "🟢";
+      statusEl.className = "status";
+
+      for (s = 1; s <= sets; s++) {
+        let thisSet = s;
+        for (sec = seconds; sec > 0; sec--) {
+          if (!running || stopped || resetCalled) return;
+          emojiEl.textContent = sec>seconds/2 ? "💪" : (sec<=5 ? "🔥" : "🙂");
+          statusEl.childNodes[1].textContent = ` เซทที่ ${thisSet}/${sets} เหลือ ${sec} วินาที`;
+          statusEl.className = "status";
+          // แถบ progress
+          let percentTick = ((seconds-sec+1)/seconds)*100;
+          barTick.style.width = percentTick + "%";
+          barSet.style.width = ( (s-1)/sets*100 ) + "%";
+          if (sec<=5) {
+            barTick.className = "progress-done danger";
+          } else {
+            barTick.className = "progress-done";
+          }
+          await sleep(1000);
+        }
+        if (!running || stopped || resetCalled) return;
+        completedSets++;
+        barSet.style.width = (completedSets/sets*100) + "%";
+        barTick.style.width = "100%";
+        emojiEl.textContent = "👏";
+        statusEl.childNodes[1].textContent = ` เซทที่ ${s} หมดเวลาแล้ว!`;
+        statusEl.className = 'status alert';
+        beepAlert();
+        await sleep(1200);
+        barTick.style.width = "0%";
+      }
+      if (!running || stopped || resetCalled) return;
+      barSet.style.width = "100%";
+      statusEl.childNodes[1].textContent = " เยี่ยม! ครบเซท! ";
+      emojiEl.textContent = "🎊";
+      statusEl.className = "status success";
+      beepSuccess();
+      stopTimer(true);
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    function stopTimer(isDone){
+      running=false; stopped=!isDone;
+      inputs.forEach(el=>el.disabled=false);
+      btnStart.disabled=false;
+      btnStop.disabled=true;
+      btnReset.disabled = !stopped && !resetCalled;
+      if (!isDone && !resetCalled) {
+        emojiEl.textContent = "⏸️";
+        statusEl.childNodes[1].textContent = " หยุดการจับเวลา";
+        statusEl.className = "status alert";
+      }
+    }
+    function resetTimer(){
+      resetCalled = true; running = false; stopped=false;
+      inputs.forEach(el=>el.disabled = false);
+      btnStart.disabled=false;
+      btnStop.disabled=true;
+      btnReset.disabled=true;
+      barSet.style.width="0%"; barTick.style.width="0%";
+      emojiEl.textContent = "😃";
+      statusEl.childNodes[1].textContent = " พร้อมเริ่ม";
+      statusEl.className = "status";
+      showInfoTotal();
+    }
+
+    form.onsubmit = function(e){
+      e.preventDefault();
+      if (!running) startTimer();
+    }
+    btnStop.onclick = function(){ if (running) stopTimer(false); }
+    btnReset.onclick = function(){ resetTimer(); }
+    inputs.forEach(inp => {
+      inp.addEventListener('input', e => {
+        const max = parseInt(inp.max,10);
+        if (inp.value !== "" && max && parseInt(inp.value,10) > max) inp.value = max;
+        showInfoTotal();
+      });
+    });
+
+  </script>
+</body>
+</html>
