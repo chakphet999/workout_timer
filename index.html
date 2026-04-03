@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>chakphet</title>
+  <title>chakphet(iOS Fix)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600&display=swap" rel="stylesheet">
@@ -108,6 +108,34 @@
     <div class="status" id="status"><span class="emoji">😃</span> พร้อมเริ่ม</div>
   </div>
   <script>
+    // --- FIXED: สร้าง AudioContext แค่ครั้งเดียว ใช้ซ้ำทุก beep ---
+    let ctx = null;
+    function beep(f=1200, dur=250, vol=0.13, type='sine') {
+      try {
+        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+        oscillator.type = type;
+        oscillator.frequency.value = f;
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.value = vol;
+        oscillator.start();
+        setTimeout(()=>{
+          oscillator.stop();
+          oscillator.disconnect();
+          gain.disconnect();
+        }, dur);
+      } catch(e){}
+    }
+    // ฟังก์ชัน beep สองแบบ
+    function beepSuccess() { beep(1420,180,0.12,'triangle'); }
+    function beepAlert()   { beep(320,410,0.13,'sawtooth'); }
+    function resetBeepContext() {
+      if (ctx) { ctx.close(); ctx = null; }
+    }
+
+    // ---- DOM ----
     const form = document.getElementById('timerForm');
     const statusEl = document.getElementById('status');
     const emojiEl = statusEl.querySelector('.emoji');
@@ -119,37 +147,7 @@
     const barTick = document.getElementById('barTick');
     const infoTotal = document.getElementById('totalTime');
 
-    let running=false, stopped=false, resetCalled=false, s=0, sec=0, sets=0, seconds=0, 
-        completedSets=0;
-
-    // Beep ฟังค์ชั่น
-    function beepSuccess() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'triangle';
-        o.frequency.setValueAtTime(1380, ctx.currentTime);
-        o.connect(g); g.connect(ctx.destination);
-        g.gain.value = 0.5;
-        o.start();
-        setTimeout(()=>{ o.frequency.setValueAtTime(3000,ctx.currentTime); },80);
-        setTimeout(() => { o.stop(); ctx.close(); }, 180);
-      } catch(e){}
-    }
-    function beepAlert() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'sawtooth';
-        o.frequency.setValueAtTime(320, ctx.currentTime);
-        o.connect(g); g.connect(ctx.destination);
-        g.gain.value = 0.3;
-        o.start();
-        setTimeout(() => { o.stop(); ctx.close(); }, 410);
-      } catch(e){}
-    }
+    let running=false, stopped=false, resetCalled=false, s=0, sec=0, sets=0, seconds=0, completedSets=0;
 
     function showInfoTotal() {
       const setVal = Number(document.getElementById('sets').value) || 0;
@@ -158,7 +156,7 @@
       let mm = Math.floor(totalSecs/60), ss = totalSecs%60;
       infoTotal.textContent = `เวลารวม ~${mm}:${ss.toString().padStart(2,"0")} นาที`;
     }
-    showInfoTotal(); // เรียกตอนโหลด
+    showInfoTotal();
 
     async function startTimer() {
       sets = parseInt(document.getElementById('sets').value, 10);
@@ -231,6 +229,7 @@
       }
     }
     function resetTimer(){
+      resetBeepContext();
       resetCalled = true; running = false; stopped=false;
       inputs.forEach(el=>el.disabled = false);
       btnStart.disabled=false;
