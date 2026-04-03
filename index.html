@@ -2,85 +2,156 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>chakphet(iOS Fix)</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <title>Time Counter - จับเวลาเป็นเซต</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Kanit', sans-serif;
-      background: linear-gradient(135deg, #81ecec, #6c5ce7 80%);
+      margin: 0;
       min-height: 100vh;
-      margin: 0; padding: 0;
-      display: flex; justify-content: center; align-items: center;
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      font-family: 'Kanit', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .container {
-      background: rgba(255,255,255,0.92);
-      border-radius: 25px;
-      padding: 38px 28px 30px 28px;
-      max-width: 400px;
-      box-shadow: 0 8px 40px 0 rgba(44,62,80,0.13);
-      text-align: center;
+      max-width: 340px;
+      width: 100%;
+      margin: 32px 0;
+      background: rgba(255,255,255,0.96);
+      border-radius: 32px;
+      box-shadow: 0 6px 34px 0 #90caf940;
+      padding: 22px 18px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    h2 { color: #4834d4; margin-bottom: .5em; font-weight:600; font-size: 2em; }
-    label { display: block; margin: 18px 0 0 0; font-size: 1.1em;color: #222f3e;text-align:left;}
+    .container h2 {
+      color: #6048c4;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      margin-bottom: 18px;
+      margin-top: 5px;
+      font-size: 1.3em;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      margin-top: 12px;
+      font-size: 1.03em;
+      color: #4b4b4b;
+      font-weight: 500;
+      text-align: left;
+    }
     input[type="number"] {
-      margin-top: 6px; width: 90%; padding: 10px;
-      border: 1.5px solid #a29bfe; border-radius: 8px; font-size: 1.1em; outline: none; background: #f8fafd;
+      width: 97%;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 1em;
+      outline: none;
+      border: 1.5px solid #a6bdfc;
+      margin-bottom: 1px;
+      transition: border .15s;
     }
-    input[type="number"]:focus { border: 2px solid #4834d4; }
-    .button-row { display: flex; gap: 10px; margin-top: 24px;width: 100%; }
+    input[type="number"]:focus {
+      border: 2px solid #6048c4;
+    }
+    .button-row {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+      margin: 14px 0 0 0;
+    }
     button {
-      padding: 14px 0;font-size: 1.12em; flex: 1 1 0; font-family: inherit;
-      background: linear-gradient(90deg, #6c5ce7 60%, #00b894 110%); color: #fff;
-      border: none; border-radius: 10px; font-weight: bold; letter-spacing: 1.5px;
-      box-shadow: 0 2px 16px 0 rgba(76,201,240,0.06); cursor:pointer; transition: background 0.20s, box-shadow 0.14s;
+      font-family: inherit;
+      font-size: 1em;
+      font-weight: 600;
+      border: none;
+      outline: none;
+      border-radius: 12px;
+      padding: 10px 0;
+      flex: 1 1 0;
+      cursor: pointer;
+      transition: background 0.18s, color .21s, box-shadow .14s;
     }
-    button[disabled] { opacity: 0.65; cursor: not-allowed; background: #bbb !important; }
-    .btn-stop { background: linear-gradient(90deg, #d63031 60%, #e17055 110%);}
-    .btn-stop:active { background: #b12c2c; }
-    .btn-reset {
-      background: linear-gradient(90deg, #636e72 60%, #b2bec3 110%);
-      color: #333;
+    #btn-start {
+      background: linear-gradient(90deg, #56ccf2 60%, #6048c4 130%);
+      color: #fff;
+      box-shadow: 0 1px 5px #56ccd24a;
     }
-    .btn-reset:active { background: #636e72; color: #fff; }
-    .status {
-      margin: 24px 0 0 0;padding: 16px; font-size: 1.4em; color: #636e72; min-height: 40px;
-      border-radius: 11px;background: linear-gradient(99deg,#fff 60%, #81ecec33 100%);
-      box-shadow: 0 1px 10px 0 #dedede1f;transition: background 0.2s, color 0.2s;
-      display: flex; align-items:center; gap:10px; justify-content: center;
+    #btn-stop {
+      background: #b2bec3;
+      color: #444;
     }
-    .status .emoji { font-size: 2.6em;}
-    .success { color: #098450; background: #e7fbee; }
-    .alert   { color: #e17055; background: #fff4ec; }
+    #btn-reset {
+      background: #b2bec3;
+      color: #444;
+    }
+    button[disabled] {
+      background: #e3e3e3 !important;
+      color: #888 !important;
+      cursor: not-allowed;
+    }
     .progress-ct {
-      margin:18px 0 4px 0; padding: 0;
+      width: 100%;
+      margin-top: 16px;
+      margin-bottom: 1px;
     }
     .progress-title {
-      font-size: 0.98em; color: #888; font-weight: 400;
-      letter-spacing: .7px;margin:0 0 6px 2px;text-align:left;
+      font-size: 0.97em;
+      color: #666;
+      margin-bottom: 4px;
+      margin-left: 9px;
+      text-align: left;
     }
     .progress-bar {
-      width:100%; height: 16px; background: #dfe6e9; border-radius: 9px;
-      margin:0; overflow: hidden; position: relative; box-shadow: 0 2px 8px 0 #d0d6f81a;
+      width: 100%;
+      height: 14px;
+      background: #ecf0f1;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 6px;
+      box-shadow: 0 1px 6px 0 #90caf981;
     }
     .progress-done {
-      height:100%; border-radius:9px;
-      background: linear-gradient(87deg, #00b894 60%, #6c5ce7 100%);
-      transition: width 0.5s cubic-bezier(.5,.56,.36,1.33), background .25s; box-shadow: 0 1px 4px 0 #22a59922;
+      height: 100%;
+      background: linear-gradient(90deg, #43e97b 60%, #38f9d7 120%);
+      border-radius: 8px;
+      transition: width 0.44s cubic-bezier(.86,.04,.36,1.33);
     }
     .progress-done.danger {
-      background: linear-gradient(90deg,#fd5a51 60%, #a29bfe 150%);
+      background: linear-gradient(90deg,#fd5a51 60%, #67e8f9 150%);
     }
     .info-bar {
-      margin: 8px 0 0 0; font-size:1.04em; color:#636e72;
+      color: #2e3238;
+      width: 100%;
+      margin: 9px 0 0 9px;
+      text-align: left;
+      font-size: 1em;
     }
-    @media (max-width: 440px) {
-      .container { padding: 18px 2px 12px 2px; }
-      .status { font-size: 1em;}
-      .progress-title { font-size:.93em;}
-      h2 { font-size:1.35em;}
-      .status .emoji { font-size: 2em;}
+    .status {
+      width: 97%;
+      margin-top: 14px;
+      padding: 14px 0 10px 0;
+      border-radius: 15px;
+      background: #e7fbff;
+      min-height: 38px;
+      font-size: 1.12em;
+      font-weight: 500;
+      color: #30475e;
+      text-align: center;
+      transition: background 0.19s, color 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .status.success  { background: #dcffe5; color: #247333; }
+    .status.alert    { background: #ffede7; color: #e17055; }
+    .status .emoji   { font-size: 1.65em; display:inline-block;margin-right:2px;}
+    @media (max-width:480px) {
+      .container { padding: 10px 2px 18px; max-width:99vw;}
     }
   </style>
 </head>
@@ -88,29 +159,29 @@
   <div class="container">
     <h2>... TIME COUNTER ...</h2>
     <form id="timerForm" autocomplete="off">
-      <label for="sets">จำนวนเซท</label>
-      <input type="number" id="sets" value="4" min="1" max="30" required>
-      <label for="seconds">วินาทีต่อเซท</label>
-      <input type="number" id="seconds" value="30" min="1" max="3600" required>
+      <label for="sets">จำนวนเซต</label>
+      <input type="number" id="sets" value="4" min="1" max="50" required>
+      <label for="seconds">วินาทีต่อเซต</label>
+      <input type="number" id="seconds" value="3" min="1" max="3600" required>
       <div class="button-row">
         <button type="submit" id="btn-start">เริ่มจับเวลา</button>
-        <button type="button" class="btn-stop" id="btn-stop" disabled>หยุด</button>
-        <button type="button" class="btn-reset" id="btn-reset" disabled>รีเซ็ต</button>
+        <button type="button" id="btn-stop" disabled>หยุด</button>
+        <button type="button" id="btn-reset" disabled>รีเซ็ต</button>
       </div>
     </form>
     <div class="progress-ct">
-      <div class="progress-title">ภาพรวมเซท</div>
+      <div class="progress-title">ภาพรวมเซต</div>
       <div class="progress-bar"><div class="progress-done" id="barSet" style="width:0%"></div></div>
-      <div class="progress-title">เวลาของเซทปัจจุบัน</div>
+      <div class="progress-title">เวลาของเซตปัจจุบัน</div>
       <div class="progress-bar"><div class="progress-done" id="barTick" style="width:0%"></div></div>
     </div>
     <div class="info-bar" id="totalTime">เวลารวม ~0:00 นาที</div>
-    <div class="status" id="status"><span class="emoji">😃</span> พร้อมเริ่ม</div>
+    <div class="status" id="status"><span class="emoji">🕒</span>พร้อมเริ่ม</div>
   </div>
   <script>
-    // --- FIXED: สร้าง AudioContext แค่ครั้งเดียว ใช้ซ้ำทุก beep ---
+    // ใช้ context เดียวสำหรับ iOS/Safari
     let ctx = null;
-    function beep(f=1200, dur=250, vol=0.13, type='sine') {
+    function beep(f=1200, dur=240, vol=0.14, type='sine') {
       try {
         if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
         const oscillator = ctx.createOscillator();
@@ -121,68 +192,68 @@
         gain.connect(ctx.destination);
         gain.gain.value = vol;
         oscillator.start();
-        setTimeout(()=>{
+        setTimeout(() => {
           oscillator.stop();
           oscillator.disconnect();
           gain.disconnect();
         }, dur);
       } catch(e){}
     }
-    // ฟังก์ชัน beep สองแบบ
-    function beepSuccess() { beep(1420,180,0.12,'triangle'); }
-    function beepAlert()   { beep(320,410,0.13,'sawtooth'); }
+    function beepSuccess() { beep(1420,180,0.13,'triangle'); }
+    function beepAlert()   { beep(360,420,0.13,'square'); }
     function resetBeepContext() {
       if (ctx) { ctx.close(); ctx = null; }
     }
 
-    // ---- DOM ----
-    const form = document.getElementById('timerForm');
-    const statusEl = document.getElementById('status');
-    const emojiEl = statusEl.querySelector('.emoji');
-    const btnStart = document.getElementById('btn-start');
-    const btnStop = document.getElementById('btn-stop');
-    const btnReset = document.getElementById('btn-reset');
-    const inputs = Array.from(form.querySelectorAll('input[type="number"]'));
-    const barSet = document.getElementById('barSet');
-    const barTick = document.getElementById('barTick');
-    const infoTotal = document.getElementById('totalTime');
-
-    let running=false, stopped=false, resetCalled=false, s=0, sec=0, sets=0, seconds=0, completedSets=0;
+    // selectors
+    const form      = document.getElementById('timerForm');
+    const statusEl  = document.getElementById('status');
+    const btnStart  = document.getElementById('btn-start');
+    const btnStop   = document.getElementById('btn-stop');
+    const btnReset  = document.getElementById('btn-reset');
+    const barSet    = document.getElementById('barSet');
+    const barTick   = document.getElementById('barTick');
+    const totalTimeEl = document.getElementById('totalTime');
+    const inputs    = [document.getElementById('sets'), document.getElementById('seconds')];
+    let running = false, stopped = false, resetCalled = false;
+    let sets = 0, seconds = 0, s = 0, sec = 0, completedSets = 0;
 
     function showInfoTotal() {
-      const setVal = Number(document.getElementById('sets').value) || 0;
-      const secVal = Number(document.getElementById('seconds').value) || 0;
+      const setVal = Number(inputs[0].value) || 0;
+      const secVal = Number(inputs[1].value) || 0;
       let totalSecs = setVal * secVal;
-      let mm = Math.floor(totalSecs/60), ss = totalSecs%60;
-      infoTotal.textContent = `เวลารวม ~${mm}:${ss.toString().padStart(2,"0")} นาที`;
+      let mm = Math.floor(totalSecs / 60), ss = totalSecs % 60;
+      if (mm < 1) {
+        totalTimeEl.textContent = `เวลารวม ~${ss} วินาที`;
+      } else {
+        totalTimeEl.textContent = `เวลารวม ~${mm}:${ss.toString().padStart(2,"0")} นาที`;
+      }
     }
     showInfoTotal();
 
     async function startTimer() {
-      sets = parseInt(document.getElementById('sets').value, 10);
-      seconds = parseInt(document.getElementById('seconds').value, 10);
+      sets = parseInt(inputs[0].value, 10);
+      seconds = parseInt(inputs[1].value, 10);
       s = 1; completedSets = 0;
       running = true; stopped = false; resetCalled = false;
 
-      inputs.forEach(el=>el.disabled=true);
-      btnStart.disabled=true;
-      btnStop.disabled=false;
-      btnReset.disabled=false;
+      inputs.forEach(el=> el.disabled = true);
+      btnStart.disabled = true;
+      btnStop.disabled  = false;
+      btnReset.disabled = false;
       barSet.style.width = "0%";
       barTick.style.width = "0%";
       barSet.className = "progress-done";
       barTick.className = "progress-done";
-      emojiEl.textContent = "🟢";
-      statusEl.className = "status";
+      statusEl.innerHTML = `<span class="emoji">🟢</span>กำลังจับเวลา...`;
 
       for (s = 1; s <= sets; s++) {
         let thisSet = s;
         for (sec = seconds; sec > 0; sec--) {
           if (!running || stopped || resetCalled) return;
-          emojiEl.textContent = sec>seconds/2 ? "💪" : (sec<=5 ? "🔥" : "🙂");
-          statusEl.childNodes[1].textContent = ` เซทที่ ${thisSet}/${sets} เหลือ ${sec} วินาที`;
-          statusEl.className = "status";
-          // แถบ progress
+          let emoji = (sec > seconds/2) ? "💪" : (sec<=5 ? "🔥" : "🙂");
+          statusEl.innerHTML = `<span class="emoji">${emoji}</span>เซตที่ ${thisSet}/${sets} เหลือ ${sec} วินาที`;
+          // progress
           let percentTick = ((seconds-sec+1)/seconds)*100;
           barTick.style.width = percentTick + "%";
           barSet.style.width = ( (s-1)/sets*100 ) + "%";
@@ -197,8 +268,7 @@
         completedSets++;
         barSet.style.width = (completedSets/sets*100) + "%";
         barTick.style.width = "100%";
-        emojiEl.textContent = "👏";
-        statusEl.childNodes[1].textContent = ` เซทที่ ${s} หมดเวลาแล้ว!`;
+        statusEl.innerHTML = `<span class="emoji">👏</span>เซตที่ ${s} หมดเวลา!`;
         statusEl.className = 'status alert';
         beepAlert();
         await sleep(1200);
@@ -206,48 +276,43 @@
       }
       if (!running || stopped || resetCalled) return;
       barSet.style.width = "100%";
-      statusEl.childNodes[1].textContent = " เยี่ยม! ครบเซท! ";
-      emojiEl.textContent = "🎊";
+      statusEl.innerHTML = `<span class="emoji">🎉</span>เยี่ยม! ครบเซต!`;
       statusEl.className = "status success";
       beepSuccess();
       stopTimer(true);
     }
-
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
-    function stopTimer(isDone){
-      running=false; stopped=!isDone;
-      inputs.forEach(el=>el.disabled=false);
-      btnStart.disabled=false;
-      btnStop.disabled=true;
+    function stopTimer(isDone) {
+      running = false; stopped = !isDone;
+      inputs.forEach(el => el.disabled = false);
+      btnStart.disabled = false;
+      btnStop.disabled = true;
       btnReset.disabled = !stopped && !resetCalled;
       if (!isDone && !resetCalled) {
-        emojiEl.textContent = "⏸️";
-        statusEl.childNodes[1].textContent = " หยุดการจับเวลา";
+        statusEl.innerHTML = `<span class="emoji">⏸️</span>หยุดการจับเวลา`;
         statusEl.className = "status alert";
       }
     }
-    function resetTimer(){
+    function resetTimer() {
       resetBeepContext();
-      resetCalled = true; running = false; stopped=false;
-      inputs.forEach(el=>el.disabled = false);
-      btnStart.disabled=false;
-      btnStop.disabled=true;
-      btnReset.disabled=true;
-      barSet.style.width="0%"; barTick.style.width="0%";
-      emojiEl.textContent = "😃";
-      statusEl.childNodes[1].textContent = " พร้อมเริ่ม";
+      resetCalled = true; running = false; stopped = false;
+      inputs.forEach(el=> el.disabled = false);
+      btnStart.disabled = false;
+      btnStop.disabled = true;
+      btnReset.disabled = true;
+      barSet.style.width = "0%"; barTick.style.width = "0%";
+      statusEl.innerHTML = `<span class="emoji">🕒</span>พร้อมเริ่ม`;
       statusEl.className = "status";
       showInfoTotal();
     }
-
-    form.onsubmit = function(e){
+    form.onsubmit = function(e) {
       e.preventDefault();
       if (!running) startTimer();
-    }
-    btnStop.onclick = function(){ if (running) stopTimer(false); }
-    btnReset.onclick = function(){ resetTimer(); }
+    };
+    btnStop.onclick = function() { if (running) stopTimer(false); };
+    btnReset.onclick = function() { resetTimer(); };
     inputs.forEach(inp => {
       inp.addEventListener('input', e => {
         const max = parseInt(inp.max,10);
@@ -255,7 +320,6 @@
         showInfoTotal();
       });
     });
-
   </script>
 </body>
 </html>
